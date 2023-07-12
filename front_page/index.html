@@ -18,47 +18,64 @@
   </header>
 
   <main class="container mx-auto px-4 py-8">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="my-4">
+      <h2 class="text-lg font-bold mb-2">Add Song</h2>
+      <form id="addSongForm" class="flex">
+        <input type="text" id="songTitleInput" placeholder="Judul Lagu" class="mr-2 px-4 py-2 border border-gray-300">
+        <input type="text" id="artistNameInput" placeholder="Penyanyi" class="mr-2 px-4 py-2 border border-gray-300">
+        <input type="text" id="songURLInput" placeholder="Lokasi lagu (local)" class="mr-2 px-4 py-2 border border-gray-300">
+        <button type="submit" class="bg-blue-500 text-white rounded-full px-4 py-2">Add</button>
+      </form>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="music_container">
       <!-- Add your music cards here -->
       <div class="bg-white rounded-lg p-4 music_card">
         <img src="https://via.placeholder.com/150" alt="Music Cover" class="w-full mb-4 music_album">
         <h2 class="text-lg font-bold music_title">Song Title</h2>
         <p class="text-sm text-gray-500 music_artist">Artist Name</p>
+        <audio src="" class="w-full" controls></audio>
       </div>
       <div class="bg-white rounded-lg p-4 music_card">
         <img src="https://via.placeholder.com/150" alt="Music Cover" class="w-full mb-4 music_album">
         <h2 class="text-lg font-bold music_title">Song Title</h2>
         <p class="text-sm text-gray-500 music_artist">Artist Name</p>
+        <audio src="" class="w-full" controls></audio>
       </div>
       <div class="bg-white rounded-lg p-4 music_card">
         <img src="https://via.placeholder.com/150" alt="Music Cover" class="w-full mb-4 music_album">
         <h2 class="text-lg font-bold music_title">Song Title</h2>
         <p class="text-sm text-gray-500 music_artist">Artist Name</p>
+        <audio src="" class="w-full" controls></audio>
       </div>
       <div class="bg-white rounded-lg p-4 music_card">
         <img src="https://via.placeholder.com/150" alt="Music Cover" class="w-full mb-4 music_album">
         <h2 class="text-lg font-bold music_title">Song Title</h2>
         <p class="text-sm text-gray-500 music_artist">Artist Name</p>
+        <audio src="" class="w-full" controls></audio>
       </div>
       <div class="bg-white rounded-lg p-4 music_card">
         <img src="https://via.placeholder.com/150" alt="Music Cover" class="w-full mb-4 music_album">
         <h2 class="text-lg font-bold music_title">Song Title</h2>
         <p class="text-sm text-gray-500 music_artist">Artist Name</p>
+        <audio src="" class="w-full" controls></audio>
       </div>
       <div class="bg-white rounded-lg p-4 music_card">
         <img src="https://via.placeholder.com/150" alt="Music Cover" class="w-full mb-4 music_album">
         <h2 class="text-lg font-bold music_title">Song Title</h2>
         <p class="text-sm text-gray-500 music_artist">Artist Name</p>
+        <audio src="" class="w-full" controls></audio>
       </div>
       <div class="bg-white rounded-lg p-4 music_card">
         <img src="https://via.placeholder.com/150" alt="Music Cover" class="w-full mb-4 music_album">
         <h2 class="text-lg font-bold music_title">Song Title</h2>
         <p class="text-sm text-gray-500 music_artist">Artist Name</p>
+        <audio src="" class="w-full" controls></audio>
       </div>
       <div class="bg-white rounded-lg p-4 music_card">
         <img src="https://via.placeholder.com/150" alt="Music Cover" class="w-full mb-4 music_album">
         <h2 class="text-lg font-bold music_title">Song Title</h2>
         <p class="text-sm text-gray-500 music_artist">Artist Name</p>
+        <audio src="" class="w-full" controls></audio>
       </div>
     </div>
   </main>
