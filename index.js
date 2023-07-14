@@ -28,15 +28,48 @@ app.get('/songs', (req, res) => {
     console.log(res);
 });
 
-app.post('/new_songs', (req, res) => {
+app.post('/songs', (req, res) => {
     // let body = req.body;
     // let username = req.params.username;
     // let cookie = req.headers.cookie;
     // res.send(`Cookie sent: ${cookie}`);
-    console.log(req.body);
+    console.log(req.params);
     songs.push(req.body);
-    console.log(songs);
-    res.json({
-        status: "success"
-    });
+    // console.log(songs);
+    const {title, artist, path} = req.body;
+    if(!title){
+        res.status(418).send("Lack of title parameter");
+    }
+    if(!artist){
+        res.status(418).send("Lack of artist name parameter");
+    }
+    if(!path){
+        res.status(418).send("Lack of path to song parameter");
+    }
+    // res.json({
+    //     status: "success",
+    //     songName: req.body.title,
+    //     artistName: req.body.artist,
+    //     songId: req.body.id
+    // })
+    res.json(songs);
+})
+app.delete('/songs:id', (req, res) => {
+    // try{
+    //     const id = req.params.id;
+    //     // songs.pop(id);
+    //     songs.forEach((song) => {
+    //         if(song.id == id){
+    //             console.log(song);
+    //         }
+    //     })
+    //     res.json(songs);
+    // }
+    // catch (error){
+    //     console.log(error);
+    //     res.send(error);
+    // }
+    const id = req.params.id;
+    console.log(id);
+    res.send(id);
 })
