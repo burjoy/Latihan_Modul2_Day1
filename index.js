@@ -1,6 +1,7 @@
 const express = require('express');
 // const cors = require('cors');
 const app = express();
+// const lagu = require('./data_lagu');
 const port = 3000;
 
 app.use(express.static('front_page'));
@@ -13,14 +14,14 @@ app.listen(port, () => {
 
 // app.use(cors());
 const songs = [
-    { title: 'Song 1', artist: 'Mardial', cover: "https://i.scdn.co/image/ab67616d0000b273f54f59079948b523fe1b9d09", path: "audio/TestSound.mp3"},
-    { title: 'Song 2', artist: 'Mamang Kesbor', cover: "https://i.scdn.co/image/ab67616d0000b273f54f59079948b523fe1b9d09", path: "audio/TestSound.mp3"},
-    { title: 'Sbm', artist: 'Mamang Kesbor', cover: "https://i.scdn.co/image/ab67616d0000b273f54f59079948b523fe1b9d09", path: "audio/TestSound.mp3"},
-    { title: 'Song 4', artist: 'Mamang Kesbor', cover: "https://i.scdn.co/image/ab67616d0000b273f54f59079948b523fe1b9d09", path: "audio/TestSound.mp3"},
-    { title: 'Song 5', artist: 'Mardial', cover: "https://i.scdn.co/image/ab67616d0000b273f54f59079948b523fe1b9d09", path: "audio/TestSound.mp3"},
-    { title: 'Song 6', artist: 'Mardial', cover: "https://i.scdn.co/image/ab67616d0000b273f54f59079948b523fe1b9d09", path: "audio/TestSound.mp3"},
-    { title: 'Song 7', artist: 'Mardial', cover: "https://i.scdn.co/image/ab67616d0000b273f54f59079948b523fe1b9d09", path: "audio/TestSound.mp3"},
-    { title: 'Song 8', artist: 'Mardial', cover: "https://i.scdn.co/image/ab67616d0000b273f54f59079948b523fe1b9d09", path: "audio/TestSound.mp3"}
+    { title: 'Song 1', artist: 'Mardial', cover: "https://i.scdn.co/image/ab67616d0000b273f54f59079948b523fe1b9d09", path: "audio/TestSound.mp3", views: 0, id: 50},
+    { title: 'Song 2', artist: 'Mamang Kesbor', cover: "https://i.scdn.co/image/ab67616d0000b273f54f59079948b523fe1b9d09", path: "audio/TestSound.mp3", views: 0, id: 60},
+    { title: 'Sbm', artist: 'Mamang Kesbor', cover: "https://i.scdn.co/image/ab67616d0000b273f54f59079948b523fe1b9d09", path: "audio/TestSound.mp3", views: 0, id: 70},
+    { title: 'Song 4', artist: 'Mamang Kesbor', cover: "https://i.scdn.co/image/ab67616d0000b273f54f59079948b523fe1b9d09", path: "audio/TestSound.mp3", views: 0, id: 80},
+    { title: 'Song 5', artist: 'Mardial', cover: "https://i.scdn.co/image/ab67616d0000b273f54f59079948b523fe1b9d09", path: "audio/TestSound.mp3", views: 0, id: 85},
+    { title: 'Song 6', artist: 'Mardial', cover: "https://i.scdn.co/image/ab67616d0000b273f54f59079948b523fe1b9d09", path: "audio/TestSound.mp3", views: 0, id: 90},
+    { title: 'Song 7', artist: 'Mardial', cover: "https://i.scdn.co/image/ab67616d0000b273f54f59079948b523fe1b9d09", path: "audio/TestSound.mp3", views: 0, id: 100},
+    { title: 'Song 8', artist: 'Mardial', cover: "https://i.scdn.co/image/ab67616d0000b273f54f59079948b523fe1b9d09", path: "audio/TestSound.mp3", views: 0, id: 105}
 ];
 
 app.get('/songs', (req, res) => {
@@ -28,7 +29,17 @@ app.get('/songs', (req, res) => {
     console.log(res);
 });
 
-app.post('/songs', (req, res) => {
+app.get('/songs/:id', async (req, res) => {
+    // res.json(songs);
+    songs.forEach((song) => {
+        if(song.id == req.params.id){
+            res.json(song);
+        }
+    })
+    console.log(res);
+});
+
+app.post('/songs', async (req, res) => {
     // let body = req.body;
     // let username = req.params.username;
     // let cookie = req.headers.cookie;
@@ -36,7 +47,7 @@ app.post('/songs', (req, res) => {
     console.log(req.params);
     songs.push(req.body);
     // console.log(songs);
-    const {title, artist, path} = req.body;
+    const {title, artist, cover, path, views, id} = req.body;
     if(!title){
         res.status(418).send("Lack of title parameter");
     }
@@ -54,22 +65,40 @@ app.post('/songs', (req, res) => {
     // })
     res.json(songs);
 })
-app.delete('/songs:id', (req, res) => {
-    // try{
-    //     const id = req.params.id;
-    //     // songs.pop(id);
-    //     songs.forEach((song) => {
-    //         if(song.id == id){
-    //             console.log(song);
-    //         }
-    //     })
-    //     res.json(songs);
-    // }
-    // catch (error){
-    //     console.log(error);
-    //     res.send(error);
-    // }
-    const id = req.params.id;
-    console.log(id);
-    res.send(id);
+
+app.patch('/songs/play/:id', (req, res) => {
+    try{
+        const id = req.params.id;
+        // const {views} = req.body;
+        songs.forEach((song) => {
+            if(song.id == id){
+                song.views += 1;
+                res.json(song);
+            }
+        })
+    }
+    catch(error){
+        res.json(error);
+    }
+})
+
+app.delete('/songs/:id', (req, res) => {
+    try{
+        const id = req.params.id;
+        // songs.pop(id);
+        songs.forEach((song) => {
+            if(song.id == id){
+                console.log(song);
+                songs.indexOf
+            }
+        })
+        res.json(songs);
+    }
+    catch (error){
+        console.log(error);
+        res.send(error);
+    }
+    // const id = req.params.id;
+    // console.log(id);
+    // res.send(id);
 })
