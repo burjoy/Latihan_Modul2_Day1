@@ -1,4 +1,3 @@
-
 const song_titles = document.querySelectorAll(".music_title");
 const song_artists = document.querySelectorAll(".music_artist");
 const cards = document.querySelectorAll(".music_card");
@@ -7,9 +6,10 @@ const randos = Math.random()*10;
 const audio = document.querySelectorAll("audio");
 const addSongForm = document.getElementById('addSongForm');
 const musicContainer = document.getElementById('music_container');
-console.log(song_artists);
-
 document.addEventListener("DOMContentLoaded", () => {
+    console.log(song_artists);
+    console.log(audio);
+  
     if(randos < 2){
         ambilData().reject;
         alert("Gagal loading data, tolong refresh halaman");
@@ -31,21 +31,24 @@ document.addEventListener("DOMContentLoaded", () => {
         })
     }
 
-    function pauseAllAudioExcept(currentAudio) {
-        audio.forEach((audio) => {
-          if (audio !== currentAudio) {
-            audio.pause();
-          }
-        });
-      }
+      function pauseAllAudioExcept(currentAudio) {
+          audio.forEach((audio) => {
+            if (audio !== currentAudio) {
+              audio.pause();
+            }
+          });
+        }
 
-    audio.forEach((audio) => {
-        audio.addEventListener('play', () => {
-          pauseAllAudioExcept(audio);
+      audio.forEach((audio) => {
+        audio.addEventListener('ended', () => {
+          updateViewer(audio.id).then((response) => {
+            console.log(response);
+            pauseAllAudioExcept(audio);
+          })
         });
-      });
+      })
 
-    function createMusicCard(title, artist, url) {
+    function createMusicCard(title, artist, url, song_id) {
         const musicCard = document.createElement('div');
         musicCard.classList.add('bg-white', 'rounded-lg', 'p-4');
   
@@ -67,6 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
         const audio = document.createElement('audio');
         audio.src = url;
+        audio.id = song_id;
         audio.classList.add('w-full');
         audio.controls = true;
         musicCard.appendChild(audio);
@@ -105,7 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(response => {
           console.log(response)
           if (songTitle !== '' && artistName !== '' && songURL !== '') {
-            const musicCard = createMusicCard(songTitle, artistName, songURL);
+            const musicCard = createMusicCard(songTitle, artistName, songURL, song_id);
             musicContainer.appendChild(musicCard);
     
             // Reset form inputs
@@ -188,7 +192,9 @@ async function postData(songTitle, artistName, songURL, song_id){
   const data = {
     title: songTitle,
     artist: artistName,
-    path: songURL, 
+    path: songURL,
+    cover: "https://via.placeholder.com/150",
+    views: 0, 
     id: song_id
   };
 
@@ -199,7 +205,24 @@ async function postData(songTitle, artistName, songURL, song_id){
   };
 
   const newSong = await fetch('http://localhost:3000/songs', options);
-  const json = newSong.json();
+  const json = await newSong.json();
   return json;
 }
+
+async function ambilDataPersonal(id){
+  const pick_song = await fetch(`http://localhost:3000/songs/${id}`);
+  const hasil = pick_song.json();
+  return hasil;
+}
+
+async function updateViewer(id){
+  const options = {
+    method: "PATCH",
+  };
+
+  const pick_song = await fetch(`http://localhost:3000/songs/play/${id}`, options);
+  const json = pick_song.json();
+  return json;
+}
+
 console.log(ambilData());
