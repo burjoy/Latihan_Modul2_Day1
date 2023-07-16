@@ -1,42 +1,40 @@
 const express = require('express');
-// const cors = require('cors');
+const cors = require('cors');
 const app = express();
-// const lagu = require('./data_lagu');
+const router = express.Router();
+const list_lagu = require('./daftar_lagu.json');
+const fs = require('fs');
+// const mongoose = require('mongoose');
+// const data_lagu = require('./models/data_lagu');
 const port = 3000;
+
+// mongoose.connect('mongodb://127.0.0.1/lagu_db')
+// .then((response) => {
+//     console.log("Berhasil konek ke database");
+// })
+// .catch((err) => {
+//     console.log(`Error: ${err}`);
+// })
 
 app.use(express.static('front_page'));
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
-app.listen(port, () => {
-    console.log(`Server listening to port ${port}`);
-});
-
-// app.use(cors());
-const songs = [
-    { title: 'Song 1', artist: 'Mardial', cover: "https://i.scdn.co/image/ab67616d0000b273f54f59079948b523fe1b9d09", path: "audio/TestSound.mp3", views: 0, id: 50},
-    { title: 'Song 2', artist: 'Mamang Kesbor', cover: "https://i.scdn.co/image/ab67616d0000b273f54f59079948b523fe1b9d09", path: "audio/TestSound.mp3", views: 0, id: 60},
-    { title: 'Sbm', artist: 'Mamang Kesbor', cover: "https://i.scdn.co/image/ab67616d0000b273f54f59079948b523fe1b9d09", path: "audio/TestSound.mp3", views: 0, id: 70},
-    { title: 'Song 4', artist: 'Mamang Kesbor', cover: "https://i.scdn.co/image/ab67616d0000b273f54f59079948b523fe1b9d09", path: "audio/TestSound.mp3", views: 0, id: 80},
-    { title: 'Song 5', artist: 'Mardial', cover: "https://i.scdn.co/image/ab67616d0000b273f54f59079948b523fe1b9d09", path: "audio/TestSound.mp3", views: 0, id: 85},
-    { title: 'Song 6', artist: 'Mardial', cover: "https://i.scdn.co/image/ab67616d0000b273f54f59079948b523fe1b9d09", path: "audio/TestSound.mp3", views: 0, id: 90},
-    { title: 'Song 7', artist: 'Mardial', cover: "https://i.scdn.co/image/ab67616d0000b273f54f59079948b523fe1b9d09", path: "audio/TestSound.mp3", views: 0, id: 100},
-    { title: 'Song 8', artist: 'Mardial', cover: "https://i.scdn.co/image/ab67616d0000b273f54f59079948b523fe1b9d09", path: "audio/TestSound.mp3", views: 0, id: 105}
-];
+app.use(cors());
 
 app.get('/songs', (req, res) => {
-    res.json(songs);
-    console.log(res);
+    res.json(list_lagu);
+    // console.log(res);
 });
 
 app.get('/songs/:id', async (req, res) => {
     // res.json(songs);
-    songs.forEach((song) => {
+    list_lagu.forEach((song) => {
         if(song.id == req.params.id){
             res.json(song);
         }
     })
-    console.log(res);
+    // console.log(res);
 });
 
 app.post('/songs', async (req, res) => {
@@ -44,8 +42,8 @@ app.post('/songs', async (req, res) => {
     // let username = req.params.username;
     // let cookie = req.headers.cookie;
     // res.send(`Cookie sent: ${cookie}`);
-    console.log(req.params);
-    songs.push(req.body);
+    // console.log(req.params);
+    // list_lagu.push(req.body);
     // console.log(songs);
     const {title, artist, cover, path, views, id} = req.body;
     if(!title){
@@ -63,42 +61,114 @@ app.post('/songs', async (req, res) => {
     //     artistName: req.body.artist,
     //     songId: req.body.id
     // })
-    res.json(songs);
+    const data = list_lagu;
+    data.push(req.body);
+    // res.json(list_lagu);
+    fs.writeFile('./daftar_lagu.json', JSON.stringify(data, null, 2), (err) => {
+        if (err) {
+            console.error(err);
+            res.status(500).send("Failed to update list_lagu");
+        } else {
+            res.json(list_lagu);
+            console.log(data);
+        }
+    });
 })
 
 app.patch('/songs/play/:id', (req, res) => {
-    try{
-        const id = req.params.id;
-        // const {views} = req.body;
-        songs.forEach((song) => {
-            if(song.id == id){
-                song.views += 1;
-                res.json(song);
-            }
-        })
-    }
-    catch(error){
-        res.json(error);
-    }
-})
+    try {
+      const id = req.params.id;
+      let updatedSong = null;
+  
+      // Find the song with the provided ID
+      list_lagu.forEach((song) => {
+        if (song.id == id) {
+          song.views += 1;
+          updatedSong = song;
+        }
+      });
 
-app.delete('/songs/:id', (req, res) => {
+      if (updatedSong) {
+        fs.writeFile('./daftar_lagu.json', JSON.stringify(list_lagu, null, 2), (err) => {
+          if (err) {
+            console.error(err);
+            res.status(500).send("Failed to update views data");
+          } else {
+            res.json(updatedSong);
+          }
+        });
+      } else {
+        res.status(404).send("Song not found");
+      }
+    } catch (error) {
+      res.json(error);
+    }
+  });
+  
+
+app.delete('/songs/delete/:id', (req, res) => {
     try{
         const id = req.params.id;
         // songs.pop(id);
-        songs.forEach((song) => {
+        list_lagu.forEach((song) => {
             if(song.id == id){
-                console.log(song);
-                songs.indexOf
+                console.log(list_lagu.indexOf(song));
+                list_lagu.splice(list_lagu.indexOf(song), 1);
             }
         })
-        res.json(songs);
+        fs.writeFile('./daftar_lagu.json', JSON.stringify(list_lagu, null, 2), (err) => {
+          if (err) {
+            console.error(err);
+            res.status(500).send("Failed to remove data");
+          } else {
+            res.json(list_lagu);
+          }
+        });
     }
     catch (error){
         console.log(error);
         res.send(error);
     }
-    // const id = req.params.id;
-    // console.log(id);
-    // res.send(id);
 })
+
+app.get('/songs/sort/AscendByTitle',(req, res) => {
+  try {
+    let sorted = list_lagu.sort((a,b) => {
+      let fa = a.title.toLowerCase();
+      let fb = b.title.toLowerCase();
+      if(fa > fb){
+         return 1;
+      }
+      else{
+          return -1
+      }
+  });
+    res.json(sorted);
+  } 
+  catch (error) {
+    res.send(error);
+  }
+})
+
+app.get('/songs/sort/DescendByTitle',(req, res) => {
+  try {
+    let sorted = list_lagu.sort((a,b) => {
+      let fa = a.title.toLowerCase();
+      let fb = b.title.toLowerCase();
+      if(fa < fb){
+         return 1;
+      }
+      else{
+          return -1
+      }
+  });
+    res.json(sorted);
+  } 
+  catch (error) {
+    res.send(error);
+  }
+})
+
+app.listen(port, () => {
+    console.log(`Server listening to port ${port}`);
+});
