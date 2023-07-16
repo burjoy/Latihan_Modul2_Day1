@@ -6,6 +6,16 @@ const randos = Math.random()*10;
 const audio = document.querySelectorAll("audio");
 const addSongForm = document.getElementById('addSongForm');
 const musicContainer = document.getElementById('music_container');
+const count_display = document.querySelectorAll(".count");
+
+const state = {
+  viewerCounts: {},
+};
+
+// document.addEventListener("click", (e) => {
+//   console.log(e.target);
+// })
+
 document.addEventListener("DOMContentLoaded", () => {
     console.log(song_artists);
     console.log(audio);
@@ -20,13 +30,18 @@ document.addEventListener("DOMContentLoaded", () => {
     else{
         ambilData()
         .then((json) => {
-            for(let i = 0;i < song_titles.length;i++){
-                song_titles[i].innerText = json[i].title;
-                song_artists[i].innerText = json[i].artist;
-                albums[i].setAttribute("src", json[i].cover);
-                audio[i].setAttribute("src", json[i].path);
-                console.log(json[i].title);
-            }
+            // for(let i = 0;i < song_titles.length;i++){
+            //     song_titles[i].innerText = json[i].title;
+            //     song_artists[i].innerText = json[i].artist;
+            //     albums[i].setAttribute("src", json[i].cover);
+            //     audio[i].setAttribute("src", json[i].path);
+            //     console.log(json[i].title);
+            // }
+            json.forEach((data) => {
+              const musicCard = createMusicCard(data.title, data.artist, data.path, data.id, data.cover);
+              musicContainer.append(musicCard);
+              console.log(data);
+            })
             console.log(json);
         })
     }
@@ -38,22 +53,28 @@ document.addEventListener("DOMContentLoaded", () => {
             }
           });
         }
-
-      audio.forEach((audio) => {
-        audio.addEventListener('ended', () => {
-          updateViewer(audio.id).then((response) => {
+      
+      let arr = Array.from(audio);
+      audio.forEach((audios) => {
+        let view = 0;
+        audios.addEventListener('click', () => {
+          updateViewer(audios.id).then((response) => {
             console.log(response);
-            pauseAllAudioExcept(audio);
+            pauseAllAudioExcept(audios);
+            view++;
+            state.viewerCounts[audios.id] = view;
+            count_display[arr.indexOf(audios)].innerText = `Count: ${state.viewerCounts}`;
           })
+          console.log(arr.indexOf(audios));
         });
       })
 
-    function createMusicCard(title, artist, url, song_id) {
+    function createMusicCard(title, artist, url, song_id, cover_path) {
         const musicCard = document.createElement('div');
         musicCard.classList.add('bg-white', 'rounded-lg', 'p-4');
   
         const image = document.createElement('img');
-        image.src = 'https://via.placeholder.com/150';
+        image.src = cover_path;
         image.alt = 'Music Cover';
         image.classList.add('w-full', 'mb-4');
         musicCard.appendChild(image);
@@ -67,13 +88,20 @@ document.addEventListener("DOMContentLoaded", () => {
         artistParagraph.textContent = artist;
         artistParagraph.classList.add('text-sm', 'text-gray-500');
         musicCard.appendChild(artistParagraph);
+
+        const counter = document.createElement('p');
+        counter.innerText = "Count: 0";
+        counter.classList.add("count");
+        musicCard.appendChild(counter);
   
+        const audio_container = document.createElement('div');
         const audio = document.createElement('audio');
         audio.src = url;
         audio.id = song_id;
         audio.classList.add('w-full');
         audio.controls = true;
-        musicCard.appendChild(audio);
+        audio_container.append(audio);
+        musicCard.appendChild(audio_container);
 
         const buttonContainer = document.createElement('div');
         buttonContainer.classList.add("flex", "justify-between", "mt-4");
@@ -109,7 +137,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(response => {
           console.log(response)
           if (songTitle !== '' && artistName !== '' && songURL !== '') {
-            const musicCard = createMusicCard(songTitle, artistName, songURL, song_id);
+            const musicCard = createMusicCard(songTitle, artistName, songURL, song_id, 'https://via.placeholder.com/150');
             musicContainer.appendChild(musicCard);
     
             // Reset form inputs
@@ -156,7 +184,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const updatedURL = urlInput.value.trim();
     
           if (updatedTitle !== '' && updatedArtist !== '' && updatedURL !== '') {
-            const updatedMusicCard = createMusicCard(updatedTitle, updatedArtist, updatedURL);
+            const updatedMusicCard = createMusicCard(updatedTitle, updatedArtist, updatedURL, 0, 'https://via.placeholder.com/150');
             updateForm.closest('.bg-white').replaceWith(updatedMusicCard);
           }
         });
@@ -165,9 +193,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     musicContainer.addEventListener('click', (e) => {
       const target = e.target;
+      console.log(target);
 
       if (target.classList.contains('deleteBtn')) {
         const musicCard = target.closest('.bg-white');
+        console.log(musicCard);
         musicCard.remove();
       } else if (target.classList.contains('updateBtn')) {
         const musicCard = target.closest('.bg-white');
@@ -184,7 +214,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 async function ambilData(){
     const songs = await fetch("http://localhost:3000/songs");
-    const hasil = await songs.json();
+    const hasil = songs.json();
     return hasil;
 }
 
@@ -224,5 +254,7 @@ async function updateViewer(id){
   const json = pick_song.json();
   return json;
 }
+
+// async function deleteSong(id)
 
 console.log(ambilData());
