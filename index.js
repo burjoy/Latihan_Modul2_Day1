@@ -28,7 +28,6 @@ app.get('/songs', (req, res) => {
 });
 
 app.get('/songs/:id', async (req, res) => {
-    // res.json(songs);
     list_lagu.forEach((song) => {
         if(song.id == req.params.id){
             res.json(song);
@@ -38,13 +37,6 @@ app.get('/songs/:id', async (req, res) => {
 });
 
 app.post('/songs', async (req, res) => {
-    // let body = req.body;
-    // let username = req.params.username;
-    // let cookie = req.headers.cookie;
-    // res.send(`Cookie sent: ${cookie}`);
-    // console.log(req.params);
-    // list_lagu.push(req.body);
-    // console.log(songs);
     const {title, artist, cover, path, views, id} = req.body;
     if(!title){
         res.status(418).send("Lack of title parameter");
@@ -55,15 +47,8 @@ app.post('/songs', async (req, res) => {
     if(!path){
         res.status(418).send("Lack of path to song parameter");
     }
-    // res.json({
-    //     status: "success",
-    //     songName: req.body.title,
-    //     artistName: req.body.artist,
-    //     songId: req.body.id
-    // })
     const data = list_lagu;
     data.push(req.body);
-    // res.json(list_lagu);
     fs.writeFile('./daftar_lagu.json', JSON.stringify(data, null, 2), (err) => {
         if (err) {
             console.error(err);
@@ -80,7 +65,6 @@ app.patch('/songs/play/:id', (req, res) => {
       const id = req.params.id;
       let updatedSong = null;
   
-      // Find the song with the provided ID
       list_lagu.forEach((song) => {
         if (song.id == id) {
           song.views += 1;
@@ -109,7 +93,6 @@ app.patch('/songs/play/:id', (req, res) => {
 app.delete('/songs/delete/:id', (req, res) => {
     try{
         const id = req.params.id;
-        // songs.pop(id);
         list_lagu.forEach((song) => {
             if(song.id == id){
                 console.log(list_lagu.indexOf(song));
@@ -156,6 +139,44 @@ app.get('/songs/sort/DescendByTitle',(req, res) => {
       let fa = a.title.toLowerCase();
       let fb = b.title.toLowerCase();
       if(fa < fb){
+         return 1;
+      }
+      else{
+          return -1
+      }
+  });
+    res.json(sorted);
+  } 
+  catch (error) {
+    res.send(error);
+  }
+})
+
+app.get('/songs/sort/AscendByViews', (req, res) => {
+  try {
+    let sorted = list_lagu.sort((a,b) => {
+      let fa = a.views;
+      let fb = b.views;
+      if(fa < fb){
+         return 1;
+      }
+      else{
+          return -1
+      }
+  });
+    res.json(sorted);
+  } 
+  catch (error) {
+    res.send(error);
+  }
+})
+
+app.get('/songs/sort/DescendByViews', (req, res) => {
+  try {
+    let sorted = list_lagu.sort((a,b) => {
+      let fa = a.views;
+      let fb = b.views;
+      if(fa > fb){
          return 1;
       }
       else{
